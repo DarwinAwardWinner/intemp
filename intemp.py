@@ -96,7 +96,10 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
     If the command succeeds, then the contents of the temporary
     directory will be moved to the target directory (default pwd). If
     the command fails, the files will remain in the temporary
-    directory (which may or may not be deleted, depending on options).
+    directory (which may or may not be deleted). This bahavior ensures
+    that only finished output files from successful commands will be
+    put into the target directory, even if the command produces output
+    files bit by bit and leaves incomplete output files upon failure.
 
     IMPORTANT: Since the specified program is run in a temporary
     directory, all paths to input files should be given as absolute
