@@ -6,7 +6,17 @@ import os
 import os.path
 import sys
 import subprocess
+import pipes
 from shutil import copy2 as copy_file, move as move_file, copytree as copy_tree, rmtree as rm_tree
+
+def shellquote(string):
+    if string == "":
+        return '""'
+    else:
+        return pipes.quote(string)
+
+def list2cmdline(cmdlist):
+    return " ".join(shellquote(x) for x in cmdlist)
 
 def ensure_nonexistent(dst, filenames, delete=False):
     """Ensure that each file does not exist in destination dir.
@@ -94,7 +104,7 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
     try:
         work_dir = tempfile.mkdtemp(dir=temp_dir)
         print "Running in %s" % work_dir
-        print "Command: %s" % subprocess.list2cmdline(command)
+        print "Command: %s" % list2cmdline(command)
         retval = subprocess.call(command, cwd=work_dir)
         success = retval == 0
 
