@@ -81,7 +81,7 @@ def plac_call_main():
     # arg=(helptext, kind, abbrev, type, choices, metavar)
     command=("The command to execute. This is best specified last after all options and a double dash: --", "positional"),
     temp_dir=("The command will be run in an empty subdirectory of this directory. After completion, all files (and directories) produced in the the subdirectory will be moved to the target directory.", "option", "t", directory),
-    target_dir=("The directory where output files will be moved after the program exits successfully. By default, this is the current working directory.", "option", "d", directory, None, "DIR"),
+    target_dir=("The directory where output files will be moved after the program exits successfully. This directory must already exist. By default, this is the current working directory.", "option", "d", directory, None, "DIR"),
     preserve_temp_dir=("When to preserve the temporary directory after completion. By default, the temporary directory is preserved only if the command fails.", "option", "p", str, ("always", "never", "failure"), 'always|never|failure'),
     overwrite=("Overwrite files in destination directory.", "flag", "o"),
     )
