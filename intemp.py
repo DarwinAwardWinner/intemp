@@ -34,7 +34,7 @@ def ensure_nonexistent(dst, filenames, delete=False):
             else:
                 raise IOError("Destination file %s already exists in %s" % (f, dst))
 
-def do_sync(src, dst, overwrite=False, move=False):
+def do_sync(src, dst, overwrite=False, move=False, quiet=False):
     """Copy all files from src to dst.
 
     If overwrite is True, then existing files and directories in the
@@ -50,13 +50,16 @@ def do_sync(src, dst, overwrite=False, move=False):
         srcfile = os.path.join(src, f)
         dstfile = os.path.join(dst, f)
         if move:
-            print "Move %s to %s" % (f, dst)
+            if not quiet:
+                print "Move %s to %s" % (f, dst)
             move_file(srcfile, dstfile)
         elif os.path.isdir(srcfile):
-            print "Copy dir %s to %s" % (f, dst)
+            if not quiet:
+                print "Copy dir %s to %s" % (f, dst)
             copy_tree(srcfile, dstfile, symlinks=True)
         else:
-            print "Copy %s to %s" % (f, dst)
+            if not quiet:
+                print "Copy %s to %s" % (f, dst)
             copy_file(srcfile, dstfile)
 
 def directory(x):
@@ -84,9 +87,10 @@ def plac_call_main():
     target_dir=("The directory where output files will be moved after the program exits successfully. This directory must already exist. By default, this is the current working directory.", "option", "d", directory, None, "DIR"),
     preserve_temp_dir=("When to preserve the temporary directory after completion. By default, the temporary directory is preserved only if the command fails.", "option", "p", str, ("always", "never", "failure"), 'always|never|failure'),
     overwrite=("Overwrite files in destination directory.", "flag", "o"),
+    quiet=("Produce no output other than what the command itself produces", "flag", "q"),
     )
 def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False,
-         preserve_temp_dir="failure", *command):
+         preserve_temp_dir="failure", quiet=False, *command):
     """Run a command in a temporary directory.
 
     If the command succeeds, then the contents of the temporary
@@ -103,20 +107,24 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
     success = False
     try:
         work_dir = tempfile.mkdtemp(dir=temp_dir)
-        print "Running in %s" % work_dir
-        print "Command: %s" % list2cmdline(command)
+        if not quiet:
+            print "Running in %s" % work_dir
+            print "Command: %s" % list2cmdline(command)
         retval = subprocess.call(command, cwd=work_dir)
         success = retval == 0
 
         if success:
-            print "Command was successful"
+            if not quiet:
+                print "Command was successful"
             try:
-                do_sync(src=work_dir, dst=target_dir, overwrite=overwrite, move=preserve_temp_dir != 'always')
+                do_sync(src=work_dir, dst=target_dir, overwrite=overwrite, move=preserve_temp_dir != 'always', quiet=quiet)
             except IOError:
                 success = False
-                print "Failed to copy result files to target dir"
+                if not quiet:
+                    print "Failed to copy result files to target dir"
         else:
-            print "Command failed"
+            if not quiet:
+                print "Command failed"
     finally:
         if not work_dir:
             pass
@@ -129,7 +137,8 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
                 preserve = preserve_temp_dir != 'never'
             verb = "preserving" if preserve else "deleting"
             adjective = "successful" if success else "failed"
-            print "%s working directory of %s run in %s" % (verb.title(), adjective, work_dir)
+            if not quiet:
+                print "%s working directory of %s run in %s" % (verb.title(), adjective, work_dir)
             if not preserve:
                 rm_tree(work_dir)
 
