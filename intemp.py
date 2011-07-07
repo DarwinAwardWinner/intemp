@@ -83,14 +83,15 @@ def plac_call_main():
 @plac.annotations(
     # arg=(helptext, kind, abbrev, type, choices, metavar)
     command=("The command to execute. This is best specified last after all options and a double dash: --", "positional"),
+    arg=("The arguments to the command. Specified after the command itself.", "positional"),
     temp_dir=("The command will be run in an empty subdirectory of this directory. After completion, all files (and directories) produced in the the subdirectory will be moved to the target directory.", "option", "t", directory),
     target_dir=("The directory where output files will be moved after the program exits successfully. This directory must already exist. By default, this is the current working directory.", "option", "d", directory, None, "DIR"),
     preserve_temp_dir=("When to preserve the temporary directory after completion. By default, the temporary directory is preserved only if the command fails.", "option", "p", str, ("always", "never", "failure"), 'always|never|failure'),
     overwrite=("Overwrite files in destination directory.", "flag", "o"),
     quiet=("Produce no output other than what the command itself produces", "flag", "q"),
     )
-def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False,
-         preserve_temp_dir="failure", quiet=False, *command):
+def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False,
+         preserve_temp_dir="failure", quiet=False, *arg):
     """Run a command in a temporary directory.
 
     If the command succeeds, then the contents of the temporary
@@ -110,10 +111,11 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
     success = False
     try:
         work_dir = tempfile.mkdtemp(dir=temp_dir)
+        full_command = (command,) + arg
         if not quiet:
             print "Running in %s" % work_dir
-            print "Command: %s" % list2cmdline(command)
-        retval = subprocess.call(command, cwd=work_dir)
+            print "Command: %s" % list2cmdline(full_command)
+        retval = subprocess.call(full_command, cwd=work_dir)
         success = retval == 0
 
         if success:
