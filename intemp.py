@@ -128,6 +128,9 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
         else:
             if not quiet:
                 print "Command failed"
+    except KeyboardInterrupt:
+        if not quiet:
+            print "\nJob canceled by Control + C."
     finally:
         if not work_dir:
             pass
