@@ -22,7 +22,7 @@ Suppose you want to run a command that takes an input file name with
 In the simplest case, you can run it with intemp.py by doing the
 following:
 
-    $ intemp.py -- -i /absolute/path/to/input.txt -o output.txt
+    $ intemp.py -- mycommand -i /absolute/path/to/input.txt -o output.txt
 
 Notice that you must specify *absolute* paths to all input files,
 because you don't know what directory your program will run in. On the
