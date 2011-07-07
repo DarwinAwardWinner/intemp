@@ -131,6 +131,10 @@ def main(temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False
     except KeyboardInterrupt:
         if not quiet:
             print "\nJob canceled by Control + C."
+        else:
+            # Print a newline to make sure the '^C' that appears in
+            # the terminal does not mess up the prompt.
+            print "\n",
     finally:
         if not work_dir:
             pass
