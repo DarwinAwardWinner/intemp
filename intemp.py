@@ -76,10 +76,6 @@ def directory(x):
     else:
         return path
 
-# Entry point
-def plac_call_main():
-    return plac.call(main)
-
 @plac.annotations(
     # arg=(helptext, kind, abbrev, type, choices, metavar)
     command=("The command to execute. This is best specified last after all options and a double dash: --", "positional"),
@@ -89,9 +85,12 @@ def plac_call_main():
     preserve_temp_dir=("When to preserve the temporary directory after completion. By default, the temporary directory is preserved only if the command fails.", "option", "p", str, ("always", "never", "failure"), 'always|never|failure'),
     overwrite=("Overwrite files in destination directory.", "flag", "o"),
     quiet=("Produce no output other than what the command itself produces", "flag", "q"),
+    stdin_file=("Read the command's standard input from this file. This and the next two options are meant as a replacement for shell redirection.", "option", "I", str, None, 'FILE'),
+    stdout_file=("Redirect the command's standard output to this file. A relative path will be relative to the temporary directory.", "option", "O", str, None, 'FILE'),
+    stderr_file=("Redirect the command's standard error stream to this file. A relative path will be relative to the temporary directory.", "option", "E", str, None, 'FILE'),
     )
 def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False,
-         preserve_temp_dir="failure", quiet=False, *arg):
+         preserve_temp_dir="failure", quiet=False, stdin_file=None, stdout_file=None, stderr_file=None, *arg):
     """Run a command in a temporary directory.
 
     If the command succeeds, then the contents of the temporary
@@ -115,7 +114,14 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
         if not quiet:
             print "Running in %s" % work_dir
             print "Command: %s" % list2cmdline(full_command)
-        retval = subprocess.call(full_command, cwd=work_dir)
+        stdin=open(stdin_file, "r")if stdin_file is not None else None
+        stdout=open(os.path.join(work_dir, stdout_file), "w") if stdout_file is not None else None
+        stderr=open(os.path.join(work_dir, stderr_file), "w") if stderr_file is not None else None
+        retval = subprocess.call(full_command, cwd=work_dir,
+                                 stdin=stdin, stdout=stdout, stderr=stderr)
+        for f in stdin, stdout, stderr:
+            if f is not None:
+                f.close()
         success = retval == 0
 
         if success:
@@ -156,6 +162,10 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
     # Return the exit code of the program, but return a failing exit
     # code if the post-run copying process failed.
     return retval if success else 1
+
+# Entry point
+def plac_call_main():
+    return plac.call(main)
 
 if __name__ == "__main__":
     sys.exit(plac_call_main())
