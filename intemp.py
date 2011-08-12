@@ -101,6 +101,12 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
     put into the target directory, even if the command produces output
     files bit by bit and leaves incomplete output files upon failure.
 
+    To separate options intended for intemp from those intended for
+    the command itself, put a double dash by itself before the
+    command, like this:
+
+    intemp [intemp options here] -- command [command's options here] arg1 arg2 ...
+
     IMPORTANT: Since the specified program is run in a temporary
     directory, all paths to input files should be given as absolute
     paths, not relative ones. On the other hand, specifying relative
