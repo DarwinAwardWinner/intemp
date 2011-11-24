@@ -114,7 +114,7 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
         if not quiet:
             print "Running in %s" % work_dir
             print "Command: %s" % list2cmdline(full_command)
-        stdin=open(stdin_file, "r")if stdin_file is not None else None
+        stdin=open(stdin_file, "r") if stdin_file is not None else None
         stdout=open(os.path.join(work_dir, stdout_file), "w") if stdout_file is not None else None
         stderr=open(os.path.join(work_dir, stderr_file), "w") if stderr_file is not None else None
         retval = subprocess.call(full_command, cwd=work_dir,
