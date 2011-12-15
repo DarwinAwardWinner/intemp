@@ -158,10 +158,12 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
         else:
             if success:
                 preserve = preserve_temp_dir == 'always'
+                adjective = "successful"
+                verb = "preserving" if preserve else "cleaning"
             else:
                 preserve = preserve_temp_dir != 'never'
-            verb = "preserving" if preserve else "deleting"
-            adjective = "successful" if success else "failed"
+                adjective = "failed"
+                verb = "preserving" if preserve else "deleting"
             if not quiet:
                 print "%s working directory of %s run in %s" % (verb.title(), adjective, work_dir)
             if not preserve:
