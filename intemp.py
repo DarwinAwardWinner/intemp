@@ -144,6 +144,7 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
                 print "Command failed with return code %s: %s" % (retval, list2cmdline(full_command))
     except KeyboardInterrupt:
         success = False
+        retval = 1
         if not quiet:
             print "\nJob canceled by Control + C."
         else:
