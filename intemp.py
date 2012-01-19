@@ -168,9 +168,13 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
                 print "%s working directory of %s run in %s" % (verb.title(), adjective, work_dir)
             if not preserve:
                 rm_tree(work_dir)
-    # Return the exit code of the program, but return a failing exit
-    # code if the post-run copying process failed.
-    return retval if success else 1
+    # Return the exit code of the command, but return a failing exit
+    # code if the command succeeded but the post-command copying process
+    # failed.
+    if retval or success:
+        return retval
+    else:
+        return 1
 
 # Entry point
 def plac_call_main():
