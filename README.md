@@ -12,6 +12,18 @@ will be copied to the real output directory. So now you know that any
 file in the output directory must be a complete output file produced
 by a successful run of your program.
 
+## Download
+
+* Option A: Clone this repository on Github:
+
+      $ git clone https://github.com/DarwinAwardWinner/intemp.git
+
+* Option B: Download the latest version [here](https://raw.github.com/DarwinAwardWinner/intemp/master/intemp.py)
+
+      $ wget https://raw.github.com/DarwinAwardWinner/intemp/master/intemp.py
+
+Either way, you need to put it in your `$PATH` and ensure that it is marked executable.
+
 ## Usage
 
 Suppose you want to run a command that takes an input file name with
