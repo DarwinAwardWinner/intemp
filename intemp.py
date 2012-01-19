@@ -141,7 +141,7 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
                     print "Failed to copy result files to target dir"
         else:
             if not quiet:
-                print "Command failed: %s" % list2cmdline(full_command)
+                print "Command failed with return code %s: %s" % (retval, list2cmdline(full_command))
     except KeyboardInterrupt:
         success = False
         if not quiet:
