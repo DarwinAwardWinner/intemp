@@ -132,7 +132,7 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
 
         if success:
             if not quiet:
-                print "Command was successful"
+                print "Command successful: %s" % list2cmdline(full_command)
             try:
                 do_sync(src=work_dir, dst=target_dir, overwrite=overwrite, move=preserve_temp_dir != 'always', quiet=quiet)
             except IOError:
@@ -141,7 +141,7 @@ def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwr
                     print "Failed to copy result files to target dir"
         else:
             if not quiet:
-                print "Command failed"
+                print "Command failed: %s" % list2cmdline(full_command)
     except KeyboardInterrupt:
         success = False
         if not quiet:
