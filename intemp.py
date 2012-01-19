@@ -9,6 +9,17 @@ import subprocess
 import pipes
 from shutil import copy2 as copy_file, move as move_file, copytree as copy_tree, rmtree as rm_tree
 
+# tempfile.gettempdir seems broken on some systems. This is a
+# workaround to actually use the environment variables when they are
+# set.
+def gettempdir():
+    for var in ('TMP', 'TEMP'):
+        val = os.getenv(var)
+        if val:
+            return val
+    else:
+        return tempfile.gettempdir()
+
 def shellquote(string):
     if string == "":
         return '""'
@@ -89,7 +100,7 @@ def directory(x):
     stdout_file=("Redirect the command's standard output to this file. A relative path will be relative to the temporary directory.", "option", "O", str, None, 'FILE'),
     stderr_file=("Redirect the command's standard error stream to this file. A relative path will be relative to the temporary directory.", "option", "E", str, None, 'FILE'),
     )
-def main(command, temp_dir=tempfile.gettempdir(), target_dir=os.getcwd(), overwrite=False,
+def main(command, temp_dir=gettempdir(), target_dir=os.getcwd(), overwrite=False,
          preserve_temp_dir="failure", quiet=False, stdin_file=None, stdout_file=None, stderr_file=None, *arg):
     """Run a command in a temporary directory.
 
