@@ -91,8 +91,8 @@ def directory(x):
     # arg=(helptext, kind, abbrev, type, choices, metavar)
     command=("The command to execute. This is best specified last after all options and a double dash: --", "positional"),
     arg=("The arguments to the command. Specified after the command itself.", "positional"),
-    temp_dir=("The command will be run in an empty subdirectory of this directory. After completion, all files (and directories) produced in the the subdirectory will be moved to the target directory. You can also use the TEMP or TMP environment variables to specify this.", "option", "t", directory),
     target_dir=("The directory where output files will be moved after the program exits successfully. This directory must already exist. By default, this is the current working directory.", "option", "d", directory, None, "DIR"),
+    temp_dir=("The command will be run in an empty subdirectory of this directory. After completion, all files (and directories) produced in the the subdirectory will be moved to the target directory. You can also use the TEMP or TMP environment variables to specify this. Note that a relative path will be relative to the target directory", "option", "t", directory),
     preserve_temp_dir=("When to preserve the temporary directory after completion. By default, the temporary directory is preserved only if the command fails.", "option", "p", str, ("always", "never", "failure"), 'always|never|failure'),
     overwrite=("Overwrite files in destination directory.", "flag", "o"),
     quiet=("Produce no output other than what the command itself produces", "flag", "q"),
@@ -100,7 +100,7 @@ def directory(x):
     stdout_file=("Redirect the command's standard output to this file. A relative path will be relative to the temporary directory.", "option", "O", str, None, 'FILE'),
     stderr_file=("Redirect the command's standard error stream to this file. A relative path will be relative to the temporary directory.", "option", "E", str, None, 'FILE'),
     )
-def main(command, temp_dir=gettempdir(), target_dir=os.getcwd(), overwrite=False,
+def main(command, target_dir=os.getcwd(), temp_dir=gettempdir(), overwrite=False,
          preserve_temp_dir="failure", quiet=False, stdin_file=None, stdout_file=None, stderr_file=None, *arg):
     """Run a command in a temporary directory.
 
@@ -126,7 +126,7 @@ def main(command, temp_dir=gettempdir(), target_dir=os.getcwd(), overwrite=False
     work_dir = None
     success = False
     try:
-        work_dir = tempfile.mkdtemp(dir=temp_dir)
+        work_dir = tempfile.mkdtemp(dir=os.path.join(target_dir, temp_dir))
         full_command = (command,) + arg
         if not quiet:
             print "Running in %s" % work_dir
