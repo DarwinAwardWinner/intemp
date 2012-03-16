@@ -98,10 +98,11 @@ def directory(x):
     quiet=("Produce no output other than what the command itself produces", "flag", "q"),
     stdin_file=("Read the command's standard input from this file. This and the next two options are meant as a replacement for shell redirection.", "option", "I", str, None, 'FILE'),
     stdout_file=("Redirect the command's standard output to this file. A relative path will be relative to the temporary directory.", "option", "O", str, None, 'FILE'),
-    stderr_file=("Redirect the command's standard error stream to this file. A relative path will be relative to the temporary directory.", "option", "E", str, None, 'FILE'),
+    stderr_file=("Redirect the command's standard error stream to this file. A relative path will be relative to the temporary directory. This can be the same path as the output file, in which case both stderr and stdout will be redirected to the same file.", "option", "E", str, None, 'FILE'),
     )
 def main(command, target_dir=os.getcwd(), temp_dir=gettempdir(), overwrite=False,
-         preserve_temp_dir="failure", quiet=False, stdin_file=None, stdout_file=None, stderr_file=None, *arg):
+         preserve_temp_dir="failure", quiet=False, stdin_file=None,
+         stdout_file=None, stderr_file=None, *arg):
     """Run a command in a temporary directory.
 
     If the command succeeds, then the contents of the temporary
@@ -132,8 +133,23 @@ def main(command, target_dir=os.getcwd(), temp_dir=gettempdir(), overwrite=False
             print "Running in %s" % work_dir
             print "Command: %s" % list2cmdline(full_command)
         stdin=open(stdin_file, "r") if stdin_file is not None else None
-        stdout=open(os.path.join(work_dir, stdout_file), "w") if stdout_file is not None else None
-        stderr=open(os.path.join(work_dir, stderr_file), "w") if stderr_file is not None else None
+
+        # Canonicalize paths
+        stdout_file = os.path.realpath(os.path.join(work_dir, stdout_file)) if stdout_file else None
+        stderr_file = os.path.realpath(os.path.join(work_dir, stderr_file)) if stderr_file else None
+
+        if stdout_file:
+            stdout = open(os.path.join(work_dir, stdout_file), "w")
+        else:
+            stdout = None
+
+        if stderr_file == stdout_file:
+            stderr = stdout
+        elif stderr_file:
+            stderr = open(os.path.join(work_dir, stderr_file), "w")
+        else:
+            stderr = None
+
         retval = subprocess.call(full_command, cwd=work_dir,
                                  stdin=stdin, stdout=stdout, stderr=stderr)
         for f in stdin, stdout, stderr:
