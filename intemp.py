@@ -39,7 +39,7 @@ def ensure_nonexistent(dst, filenames, delete=False):
         if os.path.lexists(destfile):
             if delete:
                 if os.path.isdir(destfile):
-                    shutil.rmtree(destfile)
+                    rm_tree(destfile)
                 else:
                     os.unlink(destfile)
             else:
